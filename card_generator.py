@@ -1,18 +1,14 @@
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import smtplib
 import time
-
 from io import BytesIO
 from card_image_to_pdf import create_pdf_from_image
 from email_service import send_email_with_id
-
-
 import qrcode
+import requests
 
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-
-
 from card_utils import add_rounded_corners
 
 
@@ -20,7 +16,7 @@ from card_utils import add_rounded_corners
 
 # === Positions on Card ===
 positions = {
-    "full_name": (255, 168),
+    "fullName": (255, 168),
     "institution": (255, 250),
     "member_id": (255, 287),
     "start_date": (255, 329),
@@ -31,7 +27,8 @@ positions = {
 }
 
 # === Fonts ===
-font_path = ("fonts/BricolageGrotesque_24pt_Condensed-Regular.ttf")
+font_path = ("/Users/sarfowonder/Downloads/Bricolage_Grotesque (1)"
+             "/static/BricolageGrotesque_24pt_Condensed-Regular.ttf")
 bricolage_font = ImageFont.truetype(font_path, size=21)
 
 
@@ -39,17 +36,17 @@ bricolage_font = ImageFont.truetype(font_path, size=21)
 
 def generate_card(member: dict):
     """Generate the ID card image and return it as BytesIO."""
-    base_image = Image.open("assets/base_image.jpg")
+    base_image = Image.open("assets/Template.png")
 
     # Load member photo
     try:
         if member.get("photoUrl"):
-            response = member.get(member["photoUrl"])
+            response = requests.get(member["photoUrl"])
             profile = Image.open(BytesIO(response.content))
         else:
             profile = Image.open("assets/default_pic.jpeg")
     except Exception as e:
-        print(f"⚠️ Error loading photo for {member.get('full_name')}: {e}")
+        print(f"⚠️ Error loading photo for {member.get('fullName')}: {e}")
         profile = Image.open("assets/default_pic.jpeg")
 
     base_resize = base_image.resize((600, 384), Image.LANCZOS)
@@ -61,20 +58,20 @@ def generate_card(member: dict):
     draw = ImageDraw.Draw(base_resize_2)
 
     member_data = {
-        "name": member.get("full_name") or member.get("firstName", ""),
+        "fullName": member.get("fullName") or member.get("firstName", ""),
         "email": member.get("email", ""),
         "gender": member.get("gender", ""),
         "member_id": member.get("memberId", ""),
         "institution": member.get("institution", ""),
-        "photo_url": member.get("photoUrl", ""),
-        "start_year": member.get("registrationDate", ""),
+        "photoUrl": member.get("photoUrl", ""),
+        "start_year": member.get("start_year", ""),
         "region": member.get("region", ""),
-        "completion_year": member.get("expiryDate", ""),
+        "completion_year": member.get("completion_year", ""),
 
     }
 
     # Draw text
-    draw.text(positions["full_name"], member_data["name"].upper(), font=bricolage_font, fill="#2d195e")
+    draw.text(positions["fullName"], member_data["fullName"].upper(), font=bricolage_font, fill="#2d195e")
     draw.text(positions["completion_date"], str(member_data["completion_year"]), font=bricolage_font, fill="#2d195e")
     draw.text(positions["start_date"], str(member_data["start_year"]), font=bricolage_font, fill="#2d195e")
     draw.text(positions["member_id"], "GhIE-" + str(member_data["member_id"]), font=bricolage_font, fill="#2d195e")
