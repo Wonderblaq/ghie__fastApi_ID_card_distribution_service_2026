@@ -15,8 +15,8 @@ class MemberPayload(BaseModel):
     gender: str
     region: str
     email: str
-    start_year: str
-    completion_year: str
+    registrationDate: str
+    expiryDate: str
     photoUrl: str | None
 
 
