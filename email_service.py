@@ -19,7 +19,7 @@ def send_email_with_id(recipient, member_data, buffer):
     body = (
         f"Dear {member_data['fullName']},\n\n"
         "Please find attached your official GhIE Student Membership ID card.\n\n"
-        f"Member ID: {member_data['member_id']}\n"
+        f"Member ID: {member_data['memberId']}\n"
         f"Institution: {member_data['institution']}\n\n"
         "You can preview and verify your membership details by scanning the QR code on your card.\n"
         "If you notice any errors or discrepancies, kindly contact the GhIE Student E-Card support team "
@@ -46,7 +46,7 @@ def send_email_with_id(recipient, member_data, buffer):
     buffer.seek(0)
     pdf_part.set_payload(buffer.read())
     encoders.encode_base64(pdf_part)
-    pdf_part.add_header("Content-Disposition", f"attachment; filename=GHIE-{member_data['member_id']}.pdf")
+    pdf_part.add_header("Content-Disposition", f"attachment; filename=GHIE-{member_data['memberId']}.pdf")
     msg.attach(pdf_part)
     # ==========================
 

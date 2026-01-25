@@ -61,20 +61,20 @@ def generate_card(member: dict):
         "fullName": member.get("fullName") or member.get("firstName", ""),
         "email": member.get("email", ""),
         "gender": member.get("gender", ""),
-        "member_id": member.get("memberId", ""),
+        "memberId": member.get("memberId", ""),
         "institution": member.get("institution", ""),
         "photoUrl": member.get("photoUrl", ""),
-        "start_year": member.get("start_year", ""),
+        "registrationDate": member.get("registrationDate", ""),
         "region": member.get("region", ""),
-        "completion_year": member.get("completion_year", ""),
+        "expiryDate": member.get("expiryDate", ""),
 
     }
 
     # Draw text
     draw.text(positions["fullName"], member_data["fullName"].upper(), font=bricolage_font, fill="#2d195e")
-    draw.text(positions["completion_date"], str(member_data["completion_year"]), font=bricolage_font, fill="#2d195e")
-    draw.text(positions["start_date"], str(member_data["start_year"]), font=bricolage_font, fill="#2d195e")
-    draw.text(positions["member_id"], "GhIE-" + str(member_data["member_id"]), font=bricolage_font, fill="#2d195e")
+    draw.text(positions["completion_date"], str(member_data["expiryDate"]), font=bricolage_font, fill="#2d195e")
+    draw.text(positions["start_date"], str(member_data["registrationDate"]), font=bricolage_font, fill="#2d195e")
+    draw.text(positions["member_id"],  str(member_data["memberId"]), font=bricolage_font, fill="#2d195e")
     draw.text(positions["gender"], str(member_data["gender"]).upper(), font=bricolage_font, fill="#2d195e")
     draw.text(positions["institution"], str(member_data["institution"]).upper(), font=bricolage_font, fill="#2d195e")
 

@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import uvicorn
+from fastapi import Request
+
 from card_generator import generate_card
 from card_image_to_pdf import create_pdf_from_image
 from email_service import send_email_with_id
+from typing import Optional
 
 app = FastAPI()
 
@@ -13,7 +16,7 @@ class MemberPayload(BaseModel):
     memberId: str
     institution: str
     gender: str
-    region: str
+    region: Optional[str]=None
     email: str
     registrationDate: str
     expiryDate: str
@@ -31,10 +34,15 @@ def send_card(member: MemberPayload):
     pdf_buffer = create_pdf_from_image(image_buffer, member.memberId)
     sent = send_email_with_id(member.email, member_data, pdf_buffer)
 
+    async def create_card(request: Request):
+        body = await request.json()
+        print(body)
+
     if sent:
-        return {"status": "SUCCESS"}
+        return {"status": "success"}
     else:
-        return {"status": "FAILED"}
+        return {"status": "failed"}
+
 
 
 
