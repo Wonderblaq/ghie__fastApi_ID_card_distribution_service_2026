@@ -27,8 +27,7 @@ positions = {
 }
 
 # === Fonts ===
-font_path = ("/Users/sarfowonder/Downloads/Bricolage_Grotesque (1)"
-             "/static/BricolageGrotesque_24pt_Condensed-Regular.ttf")
+font_path = ("fonts/BricolageGrotesque_24pt_Condensed-Regular.ttf")
 bricolage_font = ImageFont.truetype(font_path, size=21)
 
 

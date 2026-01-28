@@ -46,7 +46,7 @@ def send_email_with_id(recipient, member_data, buffer):
     buffer.seek(0)
     pdf_part.set_payload(buffer.read())
     encoders.encode_base64(pdf_part)
-    pdf_part.add_header("Content-Disposition", f"attachment; filename=GHIE-{member_data['memberId']}.pdf")
+    pdf_part.add_header("Content-Disposition", f"attachment; filename={member_data['memberId']}.pdf")
     msg.attach(pdf_part)
     # ==========================
 
