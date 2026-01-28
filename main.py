@@ -16,7 +16,7 @@ class MemberPayload(BaseModel):
     memberId: str
     institution: str
     gender: str
-    region: Optional[str]=None
+    region: Optional[str] = None
     email: str
     registrationDate: str
     expiryDate: str
@@ -42,10 +42,3 @@ def send_card(member: MemberPayload):
         return {"status": "success"}
     else:
         return {"status": "failed"}
-
-
-
-
-
-
-
