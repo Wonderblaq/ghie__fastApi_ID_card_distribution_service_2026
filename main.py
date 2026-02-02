@@ -34,11 +34,9 @@ def send_card(member: MemberPayload):
     pdf_buffer = create_pdf_from_image(image_buffer, member.memberId)
     sent = send_email_with_id(member.email, member_data, pdf_buffer)
 
-    async def create_card(request: Request):
-        body = await request.json()
-        print(body)
-
     if sent:
         return {"status": "success"}
     else:
         return {"status": "failed"}
+
+
