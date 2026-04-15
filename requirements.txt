@@ -10,9 +10,11 @@ idna==3.11
 pillow==12.1.0
 pydantic==2.12.5
 pydantic_core==2.41.5
+python-dotenv==1.2.2
 qrcode==8.2
 reportlab==4.4.7
 requests==2.32.5
+sib-api-v3-sdk==1.17.0
 starlette==0.50.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
