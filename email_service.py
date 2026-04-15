@@ -67,7 +67,7 @@ def send_email_with_id(recipient, member_data, buffer):
     )
 
     try:
-        # This sends via HTTP (Port 443) - Render allows this!
+        # This sends via HTTP (Port 443)
         api_instance.send_transac_email(send_smtp_email)
         print(f"✅ API Sent ID card to {recipient}")
         return True
