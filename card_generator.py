@@ -31,73 +31,77 @@ font_path = ("fonts/BricolageGrotesque_24pt_Condensed-Regular.ttf")
 bricolage_font = ImageFont.truetype(font_path, size=21)
 
 
-
-
 def generate_card(member: dict):
     """Generate the ID card image and return it as BytesIO."""
-    base_image = Image.open("assets/Template.png")
+    # Open the template
+    with Image.open("assets/Template.png") as base_image:
+        profile = None
+        try:
+            # Fetch the student photo
+            if member.get("photoUrl"):
+                response = requests.get(member["photoUrl"], timeout=5)
+                # We use BytesIO here just to load, then immediately convert to Image object
+                photo_bytes = BytesIO(response.content)
+                profile = Image.open(photo_bytes).convert("RGBA")
+                photo_bytes.close()  # Close this buffer immediately
+            else:
+                profile = Image.open("assets/default_pic.jpeg")
 
-    # Load member photo
-    try:
-        if member.get("photoUrl"):
-            response = requests.get(member["photoUrl"])
-            profile = Image.open(BytesIO(response.content))
-        else:
-            profile = Image.open("assets/default_pic.jpeg")
-    except Exception as e:
-        print(f"⚠️ Error loading photo for {member.get('fullName')}: {e}")
-        profile = Image.open("assets/default_pic.jpeg")
+            # Process the card while 'profile' and 'base_image' are both open
+            base_resize = base_image.resize((600, 384), Image.LANCZOS)
+            base_resize_2 = add_rounded_corners(base_resize, 20)
 
-    base_resize = base_image.resize((600, 384), Image.LANCZOS)
-    base_resize_2 = add_rounded_corners(base_resize, 20)
+            # Prepare the passport photo
+            profile_cropped = ImageOps.fit(profile, (186, 209), Image.LANCZOS)
 
-    passport_pic_size = (186, 209)
-    profile_cropped = ImageOps.fit(profile, passport_pic_size, Image.LANCZOS)
+            # Create drawing object
+            draw = ImageDraw.Draw(base_resize_2)
 
-    draw = ImageDraw.Draw(base_resize_2)
+            member_data = {
+                "fullName": member.get("fullName") or member.get("firstName", ""),
+                "email": member.get("email", ""),
+                "gender": member.get("gender", ""),
+                "memberId": member.get("memberId", ""),
+                "institution": member.get("institution", ""),
+                "photoUrl": member.get("photoUrl", ""),
+                "registrationDate": member.get("registrationDate", ""),
+                "region": member.get("region", ""),
+                "expiryDate": member.get("expiryDate", ""),
 
-    member_data = {
-        "fullName": member.get("fullName") or member.get("firstName", ""),
-        "email": member.get("email", ""),
-        "gender": member.get("gender", ""),
-        "memberId": member.get("memberId", ""),
-        "institution": member.get("institution", ""),
-        "photoUrl": member.get("photoUrl", ""),
-        "registrationDate": member.get("registrationDate", ""),
-        "region": member.get("region", ""),
-        "expiryDate": member.get("expiryDate", ""),
+            }
 
-    }
+            # Draw text
+            draw.text(positions["fullName"], member_data["fullName"].upper(), font=bricolage_font, fill="#2d195e")
+            draw.text(positions["completion_date"], str(member_data["expiryDate"]), font=bricolage_font, fill="#2d195e")
+            draw.text(positions["start_date"], str(member_data["registrationDate"]), font=bricolage_font,
+                      fill="#2d195e")
+            draw.text(positions["member_id"], str(member_data["memberId"]), font=bricolage_font, fill="#2d195e")
+            draw.text(positions["gender"], str(member_data["gender"]).upper(), font=bricolage_font, fill="#2d195e")
+            draw.text(positions["institution"], str(member_data["institution"]).upper(), font=bricolage_font,
+                      fill="#2d195e")
+            # 4. Paste profile photo onto the base
+            base_resize_2.paste(profile_cropped, positions["photo_path"])
 
-    # Draw text
-    draw.text(positions["fullName"], member_data["fullName"].upper(), font=bricolage_font, fill="#2d195e")
-    draw.text(positions["completion_date"], str(member_data["expiryDate"]), font=bricolage_font, fill="#2d195e")
-    draw.text(positions["start_date"], str(member_data["registrationDate"]), font=bricolage_font, fill="#2d195e")
-    draw.text(positions["member_id"],  str(member_data["memberId"]), font=bricolage_font, fill="#2d195e")
-    draw.text(positions["gender"], str(member_data["gender"]).upper(), font=bricolage_font, fill="#2d195e")
-    draw.text(positions["institution"], str(member_data["institution"]).upper(), font=bricolage_font, fill="#2d195e")
+            # 5. Generate and Paste QR Code
+            qr = qrcode.QRCode(version=1, box_size=4, border=2)
+            qr.add_data(f"https://yeghie.com/details/{member.get('memberId', '')}")
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white").resize((100, 100))
+            base_resize_2.paste(qr_img, positions["qr_code"])
 
-    # Paste profile photo
-    base_resize_2.paste(profile_cropped, positions["photo_path"])
+            # Save to memory and return
+            with BytesIO() as buffer:
+                base_resize_2.save(buffer, format="PNG", optimize=True)
+                return buffer.getvalue(), member  # member_data dict logic here
 
-    # Generate QR Code
-    base_link = "https://yeghie.com/details/"
-    full_link = base_link + str(member.get("memberId", ""))
-    qr = qrcode.QRCode(version=1, box_size=4, border=2)
-    qr.add_data(full_link)
-    qr.make(fit=True)
-    qr_img = qr.make_image(fill_color="black", back_color="white")
-    qr_img = qr_img.resize((100, 100))
-    base_resize_2.paste(qr_img, positions["qr_code"])
-
-    # Save to memory
-    buffer = BytesIO()
-    base_resize_2.save(buffer, format="PNG")
-    buffer.seek(0)
+        finally:
+            # This ensures that even if something fails, we release the RAM
+            if profile:
+                profile.close()
 
 
 
-    return buffer, member_data
+
 
 
 

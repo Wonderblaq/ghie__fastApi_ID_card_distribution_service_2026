@@ -24,8 +24,7 @@ def send_email_with_id(recipient, member_data, buffer):
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
 
     # Prepare the PDF Attachment
-    buffer.seek(0)
-    pdf_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+    pdf_base64 = base64.b64encode(buffer).decode('utf-8')
 
     attachment = sib_api_v3_sdk.SendSmtpEmailAttachment(
         content=pdf_base64,
