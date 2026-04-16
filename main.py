@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uvicorn
 from fastapi import Request
@@ -30,14 +30,22 @@ def root(name: str = "Wonder"):
 
 # Receives Single Object from java backend, process and then send card to email
 @app.post("/create_and_send_card")
-def send_card(members: MemberPayload):
-    # Process member data on ID card and PDF
-    image_buffer, member_data = generate_card(members.dict())
-    pdf_buffer = create_pdf_from_image(image_buffer, members.memberId)
+def send_single_card(members: MemberPayload):
+    try:
+        print(f"DEBUG: Starting card for {members.memberId}")
+        image_buffer, member_data = generate_card(members.dict())
 
-    # Send processed data to member's email and display info
-    sent = send_email_with_id(members.email, member_data, pdf_buffer)
-    return {"success" if sent else "failure": sent}
+        print(f"DEBUG: Image generated, creating PDF...")
+        pdf_buffer = create_pdf_from_image(image_buffer, members.memberId)
+
+        print(f"DEBUG: Sending to Brevo...")
+        sent = send_email_with_id(members.email, member_data, pdf_buffer)
+
+        return {"status": "success" if sent else "failure"}
+    except Exception as e:
+        print(f"❌ CRITICAL ERROR: {str(e)}")
+        # Return 500 than letting Render throw a 502 error
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # This endpoint allows sending cards in batches
