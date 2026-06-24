@@ -17,7 +17,7 @@ def create_pdf_from_image(image_bytes, member_id):
 
         card_width, card_height = 400, 284
 
-        # Convert bytes back to ImageReader
+        # Convert bytes safely back to ImageReader
         with BytesIO(image_bytes) as card_img_buffer:
             card_image = ImageReader(card_img_buffer)
             x = (page_width - card_width) / 2
@@ -26,6 +26,11 @@ def create_pdf_from_image(image_bytes, member_id):
 
         c.setFont("Courier-Oblique", 15)
         c.drawString(18, 80, f"GhIE Student ID Card • Member ID: {member_id}")
-        c.save()
+
+
+        c.showPage()  # Explicitly finalize the structural layout canvas page boundary
+        c.save()  # Write all pending asset tokens completely out to the stream buffer
+
+        pdf_buffer.flush()  # Push any floating metadata bytes down into the array
 
         return pdf_buffer.getvalue()

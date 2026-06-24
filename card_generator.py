@@ -91,7 +91,14 @@ def generate_card(member: dict):
 
             # Save to memory and return
             with BytesIO() as buffer:
-                base_resize_2.save(buffer, format="PNG", optimize=True)
+                base_resize_2.save(buffer, format="PNG", optimize=False) # set optimize to
+                # 'false' to prevent CPU from race condition caused by internal high computational algorithm run by cpu
+
+                # Force an explicit low-level flush down into the RAM stack
+                buffer.flush()
+
+                # Explicitly reset the memory read pointer back to the starting byte
+                buffer.seek(0)
                 return buffer.getvalue(), member  # member_data dict logic here
 
         finally:
