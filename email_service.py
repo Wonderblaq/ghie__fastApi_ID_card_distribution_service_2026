@@ -33,28 +33,217 @@ def send_email_with_id(recipient, member_data, buffer):
 
 
     # Create the Professional Email Body
-    body_html = (
-        f"<html>"
-        f"<body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>"
-        f"  <div style='max-width: 600px; margin: 20px auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;'>"
-        f"    <h2 style='color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;'>GhIE Student Membership</h2>"
-        f"    <p>Dear <strong>{member_data['fullName']}</strong>,</p>"
-        f"    <p>Congratulations! Please find your official GhIE Student Membership ID card attached to this email.</p>"
-        f"    "
-        f"    <div style='background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;'>"
-        f"      <p style='margin: 0;'><strong>Member ID:</strong> {member_data['memberId']}</p>"
-        f"      <p style='margin: 5px 0 0 0;'><strong>Institution:</strong> {member_data['institution']}</p>"
-        f"    </div>"
-        f"    "
-        f"    <p>You can preview and verify your membership details by scanning the <strong>QR code</strong> on your card.</p>"
-        f"    <p style='font-size: 0.9em; color: #666;'>If you notice any errors or discrepancies, kindly contact the GhIE Student E-Card support team immediately.</p>"
-        f"    <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>"
-        f"    <p style='margin-bottom: 0;'>Best regards,</p>"
-        f"    <p style='margin-top: 5px;'><strong>GhIE Student E-Card Team</strong></p>"
-        f"  </div>"
-        f"</body>"
-        f"</html>"
-    )
+    # Create the Professional Email Body
+    body_html = f"""
+            <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="UTF-8">
+    <title>GhIE Student Membership</title>
+    </head>
+
+    <body style="margin:0;padding:0;background:#f4f6f9;font-family:Arial,Helvetica,sans-serif;">
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f9;padding:40px 20px;">
+    <tr>
+    <td align="center">
+
+    <table width="600" cellpadding="0" cellspacing="0"
+    style="
+    background:#ffffff;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    ">
+
+        <!-- Header -->
+        <tr>
+            <td
+            style="
+            background:#0056b3;
+            color:white;
+            padding:35px;
+            text-align:center;
+            ">
+                <h1 style="margin:0;font-size:28px;">
+                    Ghana Institution of Engineering
+                </h1>
+
+                <p style="margin-top:10px;font-size:16px;opacity:.9;">
+                    Student Membership E-Card
+                </p>
+            </td>
+        </tr>
+
+        <!-- Greeting -->
+        <tr>
+            <td style="padding:40px;">
+
+                <h2 style="margin-top:0;color:#222;">
+                    Congratulations 🎉
+                </h2>
+
+                <p style="font-size:16px;color:#555;line-height:1.7;">
+                    Dear
+                    <strong>{member_data['fullName']}</strong>,
+                </p>
+
+                <p style="font-size:16px;color:#555;line-height:1.7;">
+                    We are pleased to inform you that your
+                    <strong>GhIE Student Membership ID Card</strong>
+                    has been successfully generated.
+                </p>
+
+                <p style="font-size:16px;color:#555;line-height:1.7;">
+                    Your official membership card is attached to this email as a PDF.
+                </p>
+
+            </td>
+        </tr>
+
+        <!-- Member Information -->
+        <tr>
+            <td style="padding:0 40px 30px 40px;">
+
+                <table
+                width="100%"
+                cellpadding="15"
+                cellspacing="0"
+                style="
+                background:#f7f9fc;
+                border-left:5px solid #0056b3;
+                border-radius:8px;
+                ">
+
+                    <tr>
+                        <td>
+
+                            <h3 style="margin-top:0;color:#0056b3;">
+                                Membership Details
+                            </h3>
+
+                            <p style="margin:8px 0;font-size:15px;">
+                                <strong>Member ID:</strong><br>
+                                {member_data['memberId']}
+                            </p>
+
+                            <p style="margin:8px 0;font-size:15px;">
+                                <strong>Institution:</strong><br>
+                                {member_data['institution']}
+                            </p>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+
+        <!-- Instructions -->
+        <tr>
+            <td style="padding:0 40px;">
+
+                <h3 style="color:#222;">
+                    What's Next?
+                </h3><ul style="color:#555;font-size:15px;line-height:1.8;padding-left:20px;">
+
+                    <li>Download and save your attached membership card.</li>
+
+                    <li>Present it whenever proof of GhIE student membership is required.</li>
+
+                    <li>Scan the QR Code on the card to verify your membership information.</li>
+
+                </ul>
+
+            </td>
+        </tr>
+
+        <!-- Notice -->
+        <tr>
+            <td style="padding:30px 40px;">
+
+                <table
+                width="100%"
+                cellpadding="18"
+                cellspacing="0"
+                style="
+                background:#fff8e5;
+                border-left:5px solid #ffb300;
+                border-radius:8px;
+                ">
+
+                    <tr>
+                        <td style="font-size:14px;color:#555;line-height:1.7;">
+
+                            <strong>Important Notice</strong>
+
+                            <br><br>
+
+                            If you notice any incorrect information on your membership card,
+                            please contact the GhIE Student E-Card Team as soon as possible for assistance.
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+
+        <!-- Closing -->
+        <tr>
+            <td style="padding:0 40px 35px 40px;">
+
+                <p style="font-size:16px;color:#555;line-height:1.7;">
+
+                    Thank you for being a valued member of the
+                    <strong>Ghana Institution of Engineering.</strong>
+
+                </p>
+
+                <p style="margin-top:30px;color:#555;">
+                    Best Regards,
+                </p>
+
+                <p style="margin-top:5px;font-size:18px;font-weight:bold;color:#0056b3;">
+                    GhIE Student E-Card Team
+                </p>
+
+            </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+
+            <td
+            style="
+            background:#f2f4f7;
+            text-align:center;
+            padding:25px;
+            color:#777;
+            font-size:13px;
+            line-height:1.6;
+            ">
+                Please do not reply directly to this message.
+
+                <br><br>
+
+                ©️ 2026 Ghana Institution of Engineering (GhIE)
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    </td>
+    </tr>
+    </table>
+
+    </body>
+    </html>
+    """
 
     # Construct the Email Object
     send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
