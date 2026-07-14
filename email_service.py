@@ -8,10 +8,9 @@ from pathlib import Path
 # === Brevo API Config ===
 # Use your API Key (the long xkeysib... one), NOT the SMTP password
 # This finds the directory where your script is actually located
-env_path = Path(__file__).parent / ".env"
-load_dotenv(dotenv_path=env_path)
-API_KEY = os.getenv("API_KEY")
-SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+# Docker handles loading the .env file globally; we read directly from the environment
+API_KEY = os.environ.get("API_KEY")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
 SENDER_NAME = "GhIE Student E-Card Team"
 
 
