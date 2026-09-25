@@ -30,23 +30,29 @@ def root(name: str = "Wonder"):
 
 # Receives Single Object from java backend, process and then send card to email
 @app.post("/create_and_send_card")
+@app.post("/create_and_send_card")
 def send_single_card(members: MemberPayload):
     try:
         print(f"DEBUG: Starting card for {members.memberId}")
         image_buffer, member_data = generate_card(members.dict())
 
         print(f"DEBUG: Image generated, creating PDF...")
-        pdf_buffer = create_pdf_from_image(image_buffer, members.memberId)
+        # Get raw bytes from the image buffer for ReportLab
+        image_bytes = image_buffer.getvalue()
+        image_buffer.close()
+
+        # create_pdf_from_image now returns raw PDF bytes directly
+        pdf_bytes = create_pdf_from_image(image_bytes, members.memberId)
 
         print(f"DEBUG: Sending to Brevo...")
-        sent = send_email_with_id(members.email, member_data, pdf_buffer)
+        # Pass raw PDF bytes to Brevo email service
+        sent = send_email_with_id(members.email, member_data, pdf_bytes)
 
         return {"status": "success" if sent else "failure"}
+
     except Exception as e:
         print(f"❌ CRITICAL ERROR: {str(e)}")
-        # Return 500 than letting Render throw a 502 error
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # This endpoint allows sending cards in batches
 @app.post("/send_batch_cards")
@@ -62,11 +68,3 @@ def send_batch_card(members: List[MemberPayload]): # Added List to handle batch 
         results.append({"email": member.email,
                         "status": "success" if sent else "failed"})
     return dict(processed_card=len(results), details=results)
-
-
-
-
-
-
-
-
