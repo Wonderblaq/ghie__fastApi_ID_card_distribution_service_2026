@@ -11,7 +11,6 @@ from PIL import Image
 load_dotenv()
 
 # === Brevo API Config ===
-
 API_KEY = os.environ.get("API_KEY")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
 SENDER_NAME = "GhIE Student E-Card Team"
@@ -21,7 +20,7 @@ LOGO_PATH = Path(__file__).resolve().parent / "assets" / "ghie_logo.jpg"
 # Max width/height (px) for the logo file that gets attached to the email.
 # Brevo can't render it inline in the header (see note below), so it shows
 # as a normal attachment next to the PDF - a smaller file keeps that
-# thumbnail small instead of a large image.
+# thumbnail small instead of a large image.....
 LOGO_MAX_DIMENSION = 300
 
 
