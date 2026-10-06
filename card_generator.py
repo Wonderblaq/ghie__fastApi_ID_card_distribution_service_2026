@@ -201,8 +201,6 @@ def generate_card(member: dict):
                 optimize=True
             )
 
-            base_resize.show()
-
             # Move pointer back to the beginning so the reader starts from byte 0
             buffer.seek(0)
 
