@@ -1,17 +1,11 @@
 import logging
-
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 from io import BytesIO
 
-# Set up clean logging to catch image issues gracefully
 logger = logging.getLogger("card-service")
-# # Load this once globally to save RAM
-# TEMPLATE_BG = ImageReader("assets/Frame 12682.png")
-
-# Define the asset path globally as a string constant (NOT the initialized object)
-TEMPLATE_PATH = "assets/Frame 12682.png"
+TEMPLATE_PATH = "assets/template_background.png"
 
 
 def create_pdf_from_image(image_bytes: bytes, member_id: str) -> bytes:
@@ -23,26 +17,30 @@ def create_pdf_from_image(image_bytes: bytes, member_id: str) -> bytes:
     # Draw Background
     c.drawImage(TEMPLATE_PATH, 0, 0, width=page_width, height=page_height, mask='auto')
 
-    card_width, card_height = 400, 284
+    # MANUAL DIMENSIONS & POSITIONING (Tweak these values)
+    card_width = 500  # Target width in ReportLab points
+    card_height = 320  # Target height (maintains 1.5625 aspect ratio)
 
-    # Convert bytes safely to ImageReader
+    # Calculate horizontal center
+    x = (page_width - card_width) / 2  # 47.635 pt
+
+    # Vertical offset from bottom of page
+    y = 310
+
+    # Draw Card Image with PNG Alpha Mask
     with BytesIO(image_bytes) as card_img_buffer:
         card_image = ImageReader(card_img_buffer)
-        x = (page_width - card_width) / 2
-        y = page_height - card_height - 220
-        c.drawImage(card_image, x, y, width=card_width, height=card_height)
+        c.drawImage(card_image, x, y, width=card_width, height=card_height, mask='auto')
 
-    c.setFont("Courier-Oblique", 15)
-    c.drawString(18, 80, f"GhIE Student ID Card • Member ID: {member_id}")
+    # 3. Footer Text
+    # c.setFont("Courier-Oblique", 13)
+    # c.drawString(48, 80, f"GhIE Student ID Card • Member ID: {member_id}")
 
     c.showPage()
     c.save()
 
-    # Extract bytes while stream is OPEN
     pdf_data = pdf_buffer.getvalue()
-
-    # close the buffer safely
+   # print(f"PDF size: {len(pdf_data) / (1024 * 1024):.2f} MB")
     pdf_buffer.close()
 
-    #Return the clean byte array
     return pdf_data

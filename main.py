@@ -30,7 +30,6 @@ def root(name: str = "Wonder"):
 
 # Receives Single Object from java backend, process and then send card to email
 @app.post("/create_and_send_card")
-@app.post("/create_and_send_card")
 def send_single_card(members: MemberPayload):
     try:
         print(f"DEBUG: Starting card for {members.memberId}")
@@ -54,17 +53,36 @@ def send_single_card(members: MemberPayload):
         print(f"❌ CRITICAL ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # This endpoint allows sending cards in batches
 @app.post("/send_batch_cards")
-def send_batch_card(members: List[MemberPayload]): # Added List to handle batch request
+def send_batch_card(members: List[MemberPayload]):
     results = []
     for member in members:
-        # Process member data on ID card and PDF
-        image_buffer, member_data = generate_card(member.dict())
-        pdf_buffer = create_pdf_from_image(image_buffer, member.memberId)
+        try:
+            # 1. Process member data on ID card
+            image_buffer, member_data = generate_card(member.dict())
 
-        # Send processed data to member's email and display info
-        sent = send_email_with_id(member.email, member_data, pdf_buffer)
-        results.append({"email": member.email,
-                        "status": "success" if sent else "failed"})
+            # 2. Extract raw bytes from the image buffer
+            image_bytes = image_buffer.getvalue()
+            image_buffer.close()
+
+            # 3. Create PDF bytes from raw image bytes
+            pdf_bytes = create_pdf_from_image(image_bytes, member.memberId)
+
+            # 4. Send processed data to member's email
+            sent = send_email_with_id(member.email, member_data, pdf_bytes)
+
+            results.append({
+                "email": member.email,
+                "status": "success" if sent else "failed"
+            })
+        except Exception as e:
+            print(f"❌ Batch error for {member.memberId}: {str(e)}")
+            results.append({
+                "email": member.email,
+                "status": "failed",
+                "error": str(e)
+            })
+
     return dict(processed_card=len(results), details=results)

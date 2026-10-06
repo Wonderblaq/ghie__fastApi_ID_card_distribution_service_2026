@@ -1,11 +1,19 @@
 from PIL import Image, ImageDraw, ImageOps
 
+
 def add_rounded_corners(img, radius=30):
     """Apply rounded corners to an image."""
-    mask = Image.new("L", img.size, 0)
+    # Ensure image is in RGBA mode
+    img = img.convert("RGBA")
+
+    # 1. Create mask with exact bounds [(0,0), (w-1, h-1)]
+    w, h = img.size
+    mask = Image.new("L", (w, h), 0)
     draw = ImageDraw.Draw(mask)
-    draw.rounded_rectangle([0, 0, img.size[0], img.size[1]], radius, fill=255)
-    rounded = ImageOps.fit(img, img.size)
+    draw.rounded_rectangle([(0, 0), (w - 1, h - 1)], radius=radius, fill=255)
+
+    # 2. Fit and apply alpha mask
+    rounded = ImageOps.fit(img, (w, h))
     rounded.putalpha(mask)
     return rounded
 
